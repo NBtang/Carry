@@ -1,0 +1,4 @@
+include ':glide-image-loader'
+include ':carryLibrary'
+include ':app'
+rootProject.name = "Carry"
