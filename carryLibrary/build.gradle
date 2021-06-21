@@ -5,6 +5,21 @@ apply plugin: 'kotlin-kapt'
 
 apply plugin: 'dagger.hilt.android.plugin'
 
+apply plugin: 'maven-publish'
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = 'com.github.NBtang'
+                artifactId = 'Carry'
+                version = '1.1.0'
+            }
+        }
+    }
+}
+
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
@@ -85,9 +100,7 @@ dependencies {
     api 'com.uber.autodispose:autodispose-android-archcomponents:1.1.0'
     api 'com.uber.autodispose:autodispose-android-archcomponents-ktx:1.1.0'
 
-    api 'com.laotang.quickdev:rx-activity-result:1.0.0'
-
-    api 'com.laotang.quickdev:rxtray:1.0.4'
+    api 'com.github.NBtang:Rxtray:1.1.0'
     api 'net.grandcentrix.tray:tray:0.12.0'
 
     api "androidx.startup:startup-runtime:1.0.0"
