@@ -129,7 +129,8 @@ ext {
 
 apply plugin: 'com.github.dcendents.android-maven'
 
-group = publishedGroupId                               // Maven Group ID for the artifact
+//group = publishedGroupId                               // Maven Group ID for the artifact
+group = 'https://github.com/NBtang'
 
 install {
     repositories.mavenInstaller {
