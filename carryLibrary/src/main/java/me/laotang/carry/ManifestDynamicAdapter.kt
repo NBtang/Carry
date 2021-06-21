@@ -2,13 +2,10 @@ package me.laotang.carry
 
 import android.app.Activity
 import android.app.Application
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import me.laotang.carry.di.GlobalEntryPoint
 
 class ManifestDynamicAdapter : Application.ActivityLifecycleCallbacks {
-
-    private var screenOrientation: Int = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         requestedOrientation(activity)
@@ -19,8 +16,6 @@ class ManifestDynamicAdapter : Application.ActivityLifecycleCallbacks {
         if (activity.javaClass.isAnnotationPresent(Orientation::class.java)) {
             val orientation = activity.javaClass.getAnnotation(Orientation::class.java)!!
             activity.requestedOrientation = orientation.value
-        } else {
-            activity.requestedOrientation = screenOrientation
         }
     }
 
