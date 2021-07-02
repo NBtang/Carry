@@ -4,21 +4,21 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 apply plugin: 'dagger.hilt.android.plugin'
-
-apply plugin: 'maven-publish'
-
-afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                from components.release
-                groupId = 'com.github.NBtang'
-                artifactId = 'databinding'
-                version = '1.0.0'
-            }
-        }
-    }
-}
+//
+//apply plugin: 'maven-publish'
+//
+//afterEvaluate {
+//    publishing {
+//        publications {
+//            release(MavenPublication) {
+//                from components.release
+//                groupId = 'com.github.NBtang'
+//                artifactId = 'databinding'
+//                version = '1.0.0'
+//            }
+//        }
+//    }
+//}
 
 android {
     compileSdkVersion 30

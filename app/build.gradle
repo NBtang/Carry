@@ -49,6 +49,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
+//    implementation 'com.github.NBtang:Carry:1.2.0'
     implementation project(path: ':carryLibrary')
     implementation project(path: ':jetpackMvvm')
 //    implementation project(path: ':glide-image-loader')
