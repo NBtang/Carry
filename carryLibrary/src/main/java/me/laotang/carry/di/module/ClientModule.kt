@@ -12,6 +12,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import me.jessyan.rxerrorhandler.core.RxErrorHandler
 import me.jessyan.rxerrorhandler.handler.listener.ResponseErrorListener
 import me.laotang.carry.core.http.HttpLoggingInterceptor
+import me.laotang.carry.core.json.ConverterFactory
+import me.laotang.carry.core.json.GsonConverter
+import me.laotang.carry.core.json.JsonConverter
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -42,16 +45,22 @@ object ClientModule {
         builder: Retrofit.Builder,
         client: OkHttpClient,
         httpUrl: HttpUrl,
-        gson: Gson
+        gson: Gson,
+        jsonConverter: JsonConverter
     ): Retrofit {
+        val converterFactory = if (jsonConverter is GsonConverter) {
+            GsonConverterFactory.create(gson)
+        } else {
+            ConverterFactory.create(jsonConverter)
+        }
         builder
             .baseUrl(httpUrl)//域名
             .client(client);//设置 OkHttp
         configuration?.configRetrofit(context, builder)
         builder
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())//使用 RxJava
-            .addConverterFactory(GsonConverterFactory.create(gson));//使用 Gson
-        return builder.build();
+            .addConverterFactory(converterFactory)//使用封装过的json解析器
+        return builder.build()
     }
 
     @Singleton
@@ -67,7 +76,7 @@ object ClientModule {
             .readTimeout(10, TimeUnit.SECONDS)
         configuration?.configOkHttp(context, builder)
         httpLoggingInterceptor?.let { builder.addInterceptor(it) }
-        return builder.build();
+        return builder.build()
     }
 
     @Singleton
@@ -80,6 +89,6 @@ object ClientModule {
             .builder()
             .with(context)
             .responseErrorListener(listener)
-            .build();
+            .build()
     }
 }

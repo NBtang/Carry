@@ -48,9 +48,6 @@ android {
         }
     }
 
-    viewBinding {
-        enabled = true
-    }
 }
 
 dependencies {
@@ -66,17 +63,17 @@ dependencies {
 
     api 'com.google.code.gson:gson:2.8.5'
 
-    api('com.squareup.retrofit2:retrofit:2.4.0'){
+    api('com.squareup.retrofit2:retrofit:2.9.0'){
         exclude module: 'okhttp'
         exclude module: 'okio'
     }
-    api('com.squareup.retrofit2:converter-gson:2.4.0'){
+    api('com.squareup.retrofit2:converter-gson:2.9.0'){
         exclude module: 'gson'
         exclude module: 'okhttp'
         exclude module: 'okio'
         exclude module: 'retrofit'
     }
-    api('com.squareup.retrofit2:adapter-rxjava2:2.4.0'){
+    api('com.squareup.retrofit2:adapter-rxjava2:2.9.0'){
         exclude module: 'rxjava'
         exclude module: 'okhttp'
         exclude module: 'retrofit'
@@ -87,8 +84,11 @@ dependencies {
 
     api 'com.jeremyliao:live-event-bus-x:1.7.2'
 
-    api 'androidx.lifecycle:lifecycle-common-java8:2.2.0'
     api "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    api "androidx.lifecycle:lifecycle-livedata-ktx:2.3.1"
+    api "androidx.lifecycle:lifecycle-runtime-ktx:2.3.1"
+    api "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1"
+    api "androidx.lifecycle:lifecycle-common-java8:2.3.1"
 
     api 'io.reactivex.rxjava2:rxkotlin:2.4.0'
     api 'io.reactivex.rxjava2:rxandroid:2.1.1'

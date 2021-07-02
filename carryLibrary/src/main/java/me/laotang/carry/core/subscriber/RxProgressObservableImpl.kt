@@ -11,14 +11,14 @@ class RxProgressObservableImpl(msg: String, cancelable: Boolean = true) :
             ProgressDialogUtil.showLoadingDialog(context,
                 msg,
                 cancelable,
-                DialogInterface.OnCancelListener { cancelObservable.onNext(true) },
-                DialogInterface.OnDismissListener { cancelObservable.onComplete() })
+                { cancelObservable.onNext(true) },
+                { cancelObservable.onComplete() })
         } else {
             ProgressDialogUtil.showLoadingDialog(context,
                 msg,
                 cancelable,
                 null,
-                DialogInterface.OnDismissListener { cancelObservable.onComplete() })
+                { cancelObservable.onComplete() })
         }
     }
 

@@ -17,6 +17,7 @@ import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import me.jessyan.rxerrorhandler.handler.listener.ResponseErrorListener
 import me.laotang.carry.core.http.HttpLoggingInterceptor
+import me.laotang.carry.core.json.JsonConverter
 import okhttp3.HttpUrl
 import java.io.File
 import javax.inject.Singleton
@@ -172,6 +173,24 @@ object ConfigModule {
         globalConfigModule: GlobalConfigModule
     ): HttpLoggingInterceptor? {
         return globalConfigModule.provideHttpLoggingInterceptor()
+    }
+
+    @Singleton
+    @Provides
+    fun provideRepositoryManager(
+        @EmbedRepositoryManager repositoryManager: IRepositoryManager,
+        globalConfigModule: GlobalConfigModule
+    ): IRepositoryManager {
+        return globalConfigModule.provideRepositoryManager() ?: repositoryManager
+    }
+
+    @Singleton
+    @Provides
+    fun provideJsonConverter(
+        @EmbedJsonConverter jsonConverter: JsonConverter,
+        globalConfigModule: GlobalConfigModule
+    ): JsonConverter {
+        return globalConfigModule.provideJsonConverter() ?: jsonConverter
     }
 
 }

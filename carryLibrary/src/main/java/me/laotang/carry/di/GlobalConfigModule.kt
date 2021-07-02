@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
 import me.jessyan.rxerrorhandler.handler.listener.ResponseErrorListener
 import me.laotang.carry.ManifestDynamicAdapter
+import me.laotang.carry.core.IRepositoryManager
 import me.laotang.carry.core.cache.Cache
 import me.laotang.carry.core.cache.CacheFactory
 import me.laotang.carry.core.http.BaseUrl
@@ -14,6 +15,7 @@ import me.laotang.carry.core.http.response.BaseResponseBean
 import me.laotang.carry.core.imageloader.ImageLoader
 import me.laotang.carry.core.imageloader.ImageLoaderStrategy
 import me.laotang.carry.core.imageloader.ImageLoaderViewTarget
+import me.laotang.carry.core.json.JsonConverter
 import me.laotang.carry.core.subscriber.RxProgressObservable
 import me.laotang.carry.core.subscriber.RxProgressObservableImpl
 import me.laotang.carry.util.getDefaultCacheFile
@@ -42,7 +44,9 @@ class GlobalConfigModule private constructor(builder: Builder) {
     private var mImageLoaderConfiguration: ImageLoaderConfiguration? = null
     private var mResponseDeserializer: JsonDeserializer<BaseResponseBean<*>>? = null
     private var mActivityConfigAdapter: ManifestDynamicAdapter.ActivityConfigAdapter? = null
+    private var mRepositoryManager: IRepositoryManager? = null
     private var mEnableHttpLogging: Boolean = false
+    private var mJsonConverter: JsonConverter? = null
 
     init {
         this.mApiUrl = builder.apiUrl
@@ -58,7 +62,9 @@ class GlobalConfigModule private constructor(builder: Builder) {
         this.mImageLoaderConfiguration = builder.imageLoaderConfiguration
         this.mResponseDeserializer = builder.responseDeserializer
         this.mActivityConfigAdapter = builder.activityConfigAdapter
+        this.mRepositoryManager = builder.repositoryManager
         this.mEnableHttpLogging = builder.enableHttpLogging
+        this.mJsonConverter = builder.jsonConverter
     }
 
     fun provideBaseUrl(): HttpUrl {
@@ -139,6 +145,15 @@ class GlobalConfigModule private constructor(builder: Builder) {
         ) else null
     }
 
+    fun provideRepositoryManager(): IRepositoryManager? {
+        return mRepositoryManager
+    }
+
+    fun provideJsonConverter(): JsonConverter? {
+        return mJsonConverter
+    }
+
+
     class Builder {
         internal var apiUrl: HttpUrl? = null
         internal var url: BaseUrl? = null
@@ -154,7 +169,9 @@ class GlobalConfigModule private constructor(builder: Builder) {
         internal var imageLoaderConfiguration: ImageLoaderConfiguration? = null
         internal var responseDeserializer: JsonDeserializer<BaseResponseBean<*>>? = null
         internal var activityConfigAdapter: ManifestDynamicAdapter.ActivityConfigAdapter? = null
+        internal var repositoryManager: IRepositoryManager? = null
         internal var enableHttpLogging: Boolean = false
+        internal var jsonConverter: JsonConverter? = null
 
         fun baseUrl(baseUrl: String): Builder {//基础url
             if (TextUtils.isEmpty(baseUrl)) {
@@ -243,6 +260,16 @@ class GlobalConfigModule private constructor(builder: Builder) {
 
         fun enableHttpLogging(enable: Boolean = true): Builder {
             this.enableHttpLogging = enable
+            return this
+        }
+
+        fun repositoryManager(repositoryManager: IRepositoryManager): Builder {
+            this.repositoryManager = repositoryManager
+            return this
+        }
+
+        fun jsonConverter(jsonConverter: JsonConverter): Builder {
+            this.jsonConverter = jsonConverter
             return this
         }
 

@@ -8,6 +8,7 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.components.ApplicationComponent
+import me.laotang.carry.core.json.JsonConverter
 import okhttp3.OkHttpClient
 import java.io.File
 
@@ -22,6 +23,8 @@ object GlobalEntryPoint {
         fun okHttpClient(): OkHttpClient
 
         fun gson(): Gson
+
+        fun jsonConverter(): JsonConverter
 
         @CacheFile
         fun cacheFile(): File
@@ -54,7 +57,12 @@ object GlobalEntryPoint {
             .gson()
     }
 
-    private fun getEntryPoint(context: Context): IGlobalEntryPoint {
+    fun getJsonConverter(context: Context): JsonConverter {
+        return getEntryPoint(context)
+            .jsonConverter()
+    }
+
+    internal fun getEntryPoint(context: Context): IGlobalEntryPoint {
         if (entryPoint == null) {
             entryPoint = EntryPointAccessors.fromApplication(
                 context.applicationContext,

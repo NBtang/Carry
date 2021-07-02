@@ -21,6 +21,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import me.laotang.carry.core.json.GsonConverter
+import me.laotang.carry.core.json.JsonConverter
+import me.laotang.carry.di.EmbedJsonConverter
+import me.laotang.carry.di.EmbedRepositoryManager
 import net.grandcentrix.tray.AppPreferences
 import net.grandcentrix.tray.TrayPreferences
 import retrofit2.Retrofit
@@ -56,6 +60,7 @@ object AppModule {
 
     @Singleton
     @Provides
+    @EmbedRepositoryManager
     fun provideRepositoryManager(
         retrofit: Retrofit,
         rxTray: RxTray,
@@ -80,15 +85,15 @@ object AppModule {
     @Singleton
     @Provides
     fun provideTrayConverter(
-        gson: Gson
+        jsonConverter: JsonConverter
     ): Converter {
         return object : Converter {
             override fun deserialize(serialized: String, type: Type): Any {
-                return gson.fromJson(serialized, type)
+                return jsonConverter.fromJson(serialized, type)
             }
 
             override fun serialize(value: Any): String {
-                return gson.toJson(value)
+                return jsonConverter.toJson(value, value.javaClass)
             }
 
         }
@@ -114,5 +119,14 @@ object AppModule {
             ImageLoader(strategy)
         configuration?.configImageLoader(context, imageLoader)
         return imageLoader
+    }
+
+    @Singleton
+    @Provides
+    @EmbedJsonConverter
+    fun provideJsonConverter(
+        gson: Gson
+    ): JsonConverter {
+        return GsonConverter(gson)
     }
 }

@@ -8,7 +8,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
-import com.google.gson.Gson
 import com.jakewharton.rxbinding3.view.clicks
 import me.laotang.carry.AppManager
 import me.laotang.carry.di.GlobalEntryPoint
@@ -96,16 +95,6 @@ fun Fragment.cacheFile(): File {
     return GlobalEntryPoint.getCacheFile(requireContext())
 }
 
-/**
- * gson
- */
-fun Context.gson(): Gson {
-    return GlobalEntryPoint.getGson(this)
-}
-
-fun Fragment.gson(): Gson {
-    return GlobalEntryPoint.getGson(requireContext())
-}
 
 /**
  * click
@@ -209,3 +198,8 @@ fun <T> View.clickMapObserver(
             })
     }
 }
+
+val Context.globalEntryPoint: GlobalEntryPoint.IGlobalEntryPoint
+    get() {
+        return GlobalEntryPoint.getEntryPoint(this)
+    }
