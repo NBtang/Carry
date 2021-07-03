@@ -1,48 +1,27 @@
 package me.laotang.carry.demo.domain
 
-import androidx.lifecycle.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 import me.laotang.carry.demo.model.entity.User
 import me.laotang.carry.demo.model.repository.DataRepository
 import me.laotang.carry.mvvm.domain.BaseRequest
 import javax.inject.Inject
 
+/**
+ * 实际业务请求封装类
+ */
 class UserInfoRequestImpl @Inject constructor(private val dataRepository: DataRepository) :
-    BaseRequest(), IUserInfoRequest {
+    BaseRequest() {
 
-    private val mUsersLiveData: MutableLiveData<List<User>> by lazy {
-        MutableLiveData()
-    }
-
-    val usersLiveData: LiveData<List<User>>
-        get() = mUsersLiveData.distinctUntilChanged()
-
-    private val mLoadingState: UnPeekLiveData<Boolean> by lazy {
-        UnPeekLiveData()
-    }
-
-    val loadingState: LiveData<Boolean>
-        get() = mLoadingState
-
-    override fun getUsers(lastIdQueried: Int, loading: Boolean) {
-        launch({
-            if (loading) {
-                mLoadingState.setValue(true)
-            }
+    fun getUsers(lastIdQueried: Int): Flow<List<User>> {
+        return flow {
             val users = dataRepository.getUsers(lastIdQueried)
-            if (loading) {
-                mLoadingState.setValue(false)
-            }
-            mUsersLiveData.setValue(users)
-        }, {
-            if (loading) {
-                mLoadingState.setValue(false)
-            }
-            mUsersLiveData.setValue(listOf())
-        })
+            emit(users)
+        }.catch { cause ->
+            mHandlerFactory.handleError(cause)
+            emit(listOf())
+        }
     }
 
-    override fun onDestroy(owner: LifecycleOwner) {
-        mLoadingState.setValue(false)
-        super.onDestroy(owner)
-    }
 }

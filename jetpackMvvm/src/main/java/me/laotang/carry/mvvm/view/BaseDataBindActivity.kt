@@ -17,7 +17,7 @@ abstract class BaseDataBindActivity<T : ViewDataBinding> : AppCompatActivity() {
         binding.lifecycleOwner = this
         binding.setVariable(
             dataBindingConfig.vmVariableId,
-            dataBindingConfig.stateViewModel
+            dataBindingConfig.storeViewModel
         )
         val bindingParams = dataBindingConfig.bindingParams
         for (i in 0 until bindingParams.size()) {
@@ -34,8 +34,14 @@ abstract class BaseDataBindActivity<T : ViewDataBinding> : AppCompatActivity() {
         binding.unbind()
     }
 
-    fun showLoading(message: String, cancelable: Boolean = true) {
-        ProgressDialogUtil.showLoadingDialog(this, message, cancelable = cancelable)
+    fun showLoading(message: String, cancelable: Boolean = false, onCancel: (() -> Unit)? = null) {
+        ProgressDialogUtil.showLoadingDialog(
+            context = this,
+            content = message,
+            cancelable = cancelable,
+            onCancelListener = {
+                onCancel?.invoke()
+            })
     }
 
     fun hideLoading() {

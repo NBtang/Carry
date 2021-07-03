@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 
 class DataBindingConfig(
     val vmVariableId: Int,
-    val stateViewModel: ViewModel
+    val storeViewModel: ViewModel
 ) {
     val bindingParams: SparseArray<Any> = SparseArray<Any>()
 

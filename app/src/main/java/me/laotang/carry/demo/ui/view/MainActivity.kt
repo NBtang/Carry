@@ -8,15 +8,17 @@ import me.laotang.carry.core.json.JsonConverter
 import me.laotang.carry.demo.BR
 import me.laotang.carry.demo.R
 import me.laotang.carry.demo.databinding.ActivityMainBinding
-import me.laotang.carry.demo.ui.state.MainViewModel
+import me.laotang.carry.demo.ui.action.UserInfoActionCreator
+import me.laotang.carry.demo.ui.store.MainViewModel
 import me.laotang.carry.mvvm.view.BaseDataBindActivity
 import me.laotang.carry.mvvm.view.DataBindingConfig
+import me.laotang.carry.util.post
 import me.laotang.carry.util.toasty
 import javax.inject.Inject
 
 /**
  * 通过dataBinding实现UI的数据驱动
- * viewModel作为state使用，view层的数据要与viewModel中保持一致，除了某些数据比如滑动到了某个位置等状态
+ * viewModel作为Store使用，view层的数据要与viewModel中保持一致，除了某些数据比如滑动到了某个位置等状态
  * 可以通过viewModel中的数据，恢复view层的UI
  */
 @AndroidEntryPoint
@@ -25,29 +27,40 @@ class MainActivity : BaseDataBindActivity<ActivityMainBinding>() {
     @Inject
     lateinit var jsonConverter: JsonConverter
 
-    private val state by viewModels<MainViewModel>()
+    private val store by viewModels<MainViewModel>()
+
+    private val listenerHandler: ListenerHandler by lazy {
+        ListenerHandler(store)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         //Request响应view层的生命周期，自动取消任务
-        lifecycle.addObserver(state.userInfoRequest)
+        lifecycle.addObserver(store.userInfoRequest)
 
         //监听loading显示事件
-        state.showLoadingLiveData.observe(this, {
+        store.loadingLiveData.observe(this, {
             if (it) {
                 showLoading("加载中...")
             } else {
                 hideLoading()
             }
         })
+
+        if (savedInstanceState == null) {
+            //liveData响应生命周期不一定及时，通过view.post来确保liveData的订阅有效
+            binding.root.post {
+                store.dispatcher.dispatch(UserInfoActionCreator.getUsers(0))
+            }
+        }
     }
 
     override fun layoutId(): Int = R.layout.activity_main
 
     override fun getDataBindingConfig(): DataBindingConfig {
-        return DataBindingConfig(vmVariableId = BR.vm, stateViewModel = state)
-            .addBindingParam(BR.listener, ListenerHandler(state))
+        return DataBindingConfig(BR.vm, store)
+            .addBindingParam(BR.listener, listenerHandler)
     }
 
     /**
@@ -55,17 +68,16 @@ class MainActivity : BaseDataBindActivity<ActivityMainBinding>() {
      * MainActivity处理其他和model层不交互的UI事件
      * 进一步保证view层的UI显示由viewModel中的数据来驱动
      */
-    class ListenerHandler(state: MainViewModel) {
+    class ListenerHandler(private val store: MainViewModel) {
         val userInfoRequestConsumer: Consumer<Unit> by lazy {
             Consumer<Unit> {
-                val lastIdQueried = state.lastIdQueried.toIntOrNull()
+                val lastIdQueried = store.lastIdQueried.toIntOrNull()
                 if (lastIdQueried == null) {
                     "Id不能为空".toasty()
                     return@Consumer
                 }
-                state.userInfoRequest.getUsers(lastIdQueried)
+                store.dispatcher.dispatch(UserInfoActionCreator.getUsers(lastIdQueried))
             }
         }
-
     }
 }

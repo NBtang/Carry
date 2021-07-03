@@ -5,23 +5,22 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.components.ApplicationComponent
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import me.jessyan.rxerrorhandler.core.RxErrorHandler
 import me.jessyan.rxerrorhandler.handler.ErrorHandlerFactory
 import me.laotang.carry.AppManager
 
 /**
- * 内部维护一个LifecycleRegistry，方便与view层的生命周期进行绑定
+ * 根据业务抽离一个个Request，便于复用
+ * 内部维护一个LifecycleRegistry，注册后可与view层的生命周期响应
+ * 方便RxJava，协程等生命周期管理
  */
-open class BaseRequest : DefaultLifecycleObserver, LifecycleOwner {
+abstract class BaseRequest : IRequest, DefaultLifecycleObserver, LifecycleOwner {
 
     private var mLifecycleRegistry: LifecycleRegistry? = null
 
     //全局异常回调
-    private val mHandlerFactory: ErrorHandlerFactory
+    protected lateinit var mHandlerFactory: ErrorHandlerFactory
 
     @EntryPoint
     @InstallIn(ApplicationComponent::class)
@@ -30,12 +29,8 @@ open class BaseRequest : DefaultLifecycleObserver, LifecycleOwner {
     }
 
     init {
-        val entryPoint = EntryPointAccessors.fromApplication(
-            AppManager.instance.getApplicationContext(),
-            BaseRequestEntryPoint::class.java
-        )
-        mHandlerFactory = entryPoint.rxErrorHandler().handlerFactory
         initLifecycle()
+        initErrorHandler()
     }
 
     private fun initLifecycle(): LifecycleRegistry {
@@ -45,6 +40,15 @@ open class BaseRequest : DefaultLifecycleObserver, LifecycleOwner {
         return mLifecycleRegistry!!
     }
 
+    private fun initErrorHandler() {
+        val entryPoint = EntryPointAccessors.fromApplication(
+            AppManager.instance.getApplicationContext(),
+            BaseRequestEntryPoint::class.java
+        )
+        mHandlerFactory = entryPoint.rxErrorHandler().handlerFactory
+    }
+
+    //生命周期相关
     override fun getLifecycle(): Lifecycle {
         return initLifecycle()
     }
@@ -75,7 +79,8 @@ open class BaseRequest : DefaultLifecycleObserver, LifecycleOwner {
         mLifecycleRegistry = null
     }
 
-    fun launch(
+    //协程辅助
+    protected fun launch(
         block: suspend CoroutineScope.() -> Unit,
         onError: ((Throwable) -> Unit),
         enableHandleError: Boolean = true
@@ -91,7 +96,10 @@ open class BaseRequest : DefaultLifecycleObserver, LifecycleOwner {
             block()
         }
 
-    fun launch(enableHandleError: Boolean = true, block: suspend CoroutineScope.() -> Unit) =
+    protected fun launch(
+        enableHandleError: Boolean = true,
+        block: suspend CoroutineScope.() -> Unit
+    ) =
         lifecycleScope.launch(CoroutineExceptionHandler { _, throwable ->
             if (throwable !is CancellationException && enableHandleError) {
                 mHandlerFactory.handleError(throwable)

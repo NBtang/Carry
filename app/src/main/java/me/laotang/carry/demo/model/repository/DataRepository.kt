@@ -8,6 +8,10 @@ import me.laotang.carry.demo.model.entity.User
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
+/**
+ * 数据提供者（网络数据或者本地缓存数据）
+ */
 @Singleton
 class DataRepository @Inject constructor(private val repositoryManager: IRepositoryManager) {
 

@@ -3,7 +3,7 @@
     <data>
         <variable
             name="vm"
-            type="me.laotang.carry.demo.ui.state.MainViewModel" />
+            type="me.laotang.carry.demo.ui.store.MainViewModel" />
 
         <variable
             name="listener"
