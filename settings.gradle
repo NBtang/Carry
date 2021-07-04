@@ -1,4 +1,3 @@
-include ':jetpackMvvm'
 include ':app'
 include ':carryLibrary'
 rootProject.name = "Carry"
