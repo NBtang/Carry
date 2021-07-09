@@ -77,3 +77,15 @@ inline fun <T> ImageLoaderViewTarget<T>.config(block: ImageLoaderViewTarget<T>.(
     this.block()
     return this
 }
+
+fun String.toImageLoaderViewTarget(): ImageLoaderViewTarget<String> {
+    return UrlImageLoaderViewTarget(this)
+}
+
+fun File.toImageLoaderViewTarget(): ImageLoaderViewTarget<File> {
+    return FileImageLoaderViewTarget(this)
+}
+
+fun Uri.toImageLoaderViewTarget(): ImageLoaderViewTarget<Uri> {
+    return UriImageLoaderViewTarget(this)
+}

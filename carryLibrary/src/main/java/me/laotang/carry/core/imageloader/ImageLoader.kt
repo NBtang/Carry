@@ -27,6 +27,14 @@ class ImageLoader(
         this.mStrategy?.clear(view)
     }
 
+    fun pause(){
+        this.mStrategy?.pause()
+    }
+
+    fun resume(){
+        this.mStrategy?.resume()
+    }
+
     fun setLoadImgStrategy(strategy: ImageLoaderStrategy<ImageLoaderViewTarget<*>>?) {
         this.mStrategy = strategy
     }
