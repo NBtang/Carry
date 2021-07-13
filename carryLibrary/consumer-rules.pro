@@ -105,6 +105,11 @@
 
 -dontwarn io.reactivex.internal.util.unsafe.**
 
+-keep class android.support.annotation.Keep
+
+-keep @android.support.annotation.Keep class * {*;}
+
+
 #SpiderMan
 -keep class com.simple.spiderman.** { *; }
 -keepnames class com.simple.spiderman.** { *; }
@@ -116,8 +121,8 @@
 -keep public class * extends androidx.annotation.** { *; }
 -keep public class * extends androidx.core.content.FileProvider
 
--keep class * implements com.your.shadow.support.core.IConfigModule{*;}
--keep interface * implements com.your.shadow.support.core.IConfigModule
+-keep class * implements me.laotang.carry.core.IConfigModule{*;}
+-keep interface * implements me.laotang.carry.core.IConfigModule
 
--keep public class * extends com.your.shadow.support.core.http.response.ResponseBean{ *; }
--keep public class com.your.shadow.support.core.http.response.BaseResponseBean{ *; }
+-keep public class * extends me.laotang.carry.core.http.response.ResponseBean{ *; }
+-keep public class me.laotang.carry.core.http.response.BaseResponseBean{ *; }

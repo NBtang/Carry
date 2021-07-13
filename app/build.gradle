@@ -6,6 +6,8 @@ apply plugin: 'kotlin-kapt'
 
 apply plugin: 'dagger.hilt.android.plugin'
 
+apply plugin: 'quick-auto-register'
+
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
@@ -39,6 +41,9 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {

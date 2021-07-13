@@ -1,11 +1,12 @@
-package me.laotang.carry.core
+package me.laotang.carry.di
 
 import android.content.Context
+import android.text.TextUtils
+import androidx.annotation.Keep
 import com.google.gson.JsonDeserializer
 import me.laotang.carry.app.AppLifecycleCallbacks
 import me.laotang.carry.ManifestDynamicAdapter
 import me.laotang.carry.core.cache.Cache
-import me.laotang.carry.di.*
 import me.laotang.carry.core.http.response.BaseResponseBean
 import me.laotang.carry.core.http.response.BaseResponseBeanDeserializer
 import me.laotang.carry.core.imageloader.ImageLoaderStrategy
@@ -16,18 +17,24 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import me.jessyan.rxerrorhandler.handler.listener.ResponseErrorListener
+import me.laotang.carry.core.IConfigModule
+import me.laotang.carry.core.IRepositoryManager
+import me.laotang.carry.core.ManifestParser
 import me.laotang.carry.core.http.HttpLoggingInterceptor
 import me.laotang.carry.core.json.JsonConverter
 import okhttp3.HttpUrl
 import java.io.File
+import java.lang.reflect.InvocationTargetException
 import javax.inject.Singleton
 
 @Module
 @InstallIn(ApplicationComponent::class)
-object ConfigModule {
+object GlobalComponent {
 
     private var mGlobalConfigModule: GlobalConfigModule? = null
     private var mAppLifecycleCallbacks: MutableList<AppLifecycleCallbacks> = mutableListOf()
+
+    private var mAutoRegisterModules: MutableList<IConfigModule>? = null
 
     private var initialized: Boolean = false
 
@@ -37,16 +44,46 @@ object ConfigModule {
             return
         }
         initialized = true
-
+        loadAutoRegister()
         val builder =
             GlobalConfigModule.builder()
-        val configModules =
-            ManifestParser(context).parse()
+        val configModules = mAutoRegisterModules ?: ManifestParser(context).parse()
         for (configModule in configModules) {
             configModule.applyOptions(context, builder)
             configModule.addAppLifecycleCallback(mAppLifecycleCallbacks)
         }
         mGlobalConfigModule = builder.build()
+        mAutoRegisterModules = null
+    }
+
+    @Keep
+    private fun loadAutoRegister() {
+
+    }
+
+    @Keep
+    private fun register(className: String) {
+        if (!TextUtils.isEmpty(className)) {
+            try {
+                val clazz = Class.forName(className)
+                val obj = clazz.getConstructor().newInstance()
+                if (obj is IConfigModule) {
+                    mAutoRegisterModules = (mAutoRegisterModules ?: mutableListOf())
+                    mAutoRegisterModules?.add(obj)
+                }
+            } catch (e: ClassNotFoundException) {
+                e.printStackTrace()
+            } catch (e: IllegalAccessException) {
+                e.printStackTrace()
+            } catch (e: InstantiationException) {
+                e.printStackTrace()
+            } catch (e: NoSuchMethodException) {
+                e.printStackTrace()
+            } catch (e: InvocationTargetException) {
+                e.printStackTrace()
+            }
+
+        }
     }
 
     internal fun getAppLifecycleCallbacks(): List<AppLifecycleCallbacks> {
