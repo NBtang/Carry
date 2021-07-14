@@ -47,6 +47,7 @@ class GlobalConfigModule private constructor(builder: Builder) {
     private var mRepositoryManager: IRepositoryManager? = null
     private var mEnableHttpLogging: Boolean = false
     private var mJsonConverter: JsonConverter? = null
+    private var mCustomConfigurationWrap: CustomConfigurationWrap? = null
 
     init {
         this.mApiUrl = builder.apiUrl
@@ -65,6 +66,7 @@ class GlobalConfigModule private constructor(builder: Builder) {
         this.mRepositoryManager = builder.repositoryManager
         this.mEnableHttpLogging = builder.enableHttpLogging
         this.mJsonConverter = builder.jsonConverter
+        this.mCustomConfigurationWrap = builder.customConfigurationWrap
     }
 
     fun provideBaseUrl(): HttpUrl {
@@ -153,6 +155,10 @@ class GlobalConfigModule private constructor(builder: Builder) {
         return mJsonConverter
     }
 
+    fun provideCustomConfigurationWrap(): CustomConfigurationWrap? {
+        return mCustomConfigurationWrap
+    }
+
 
     class Builder {
         internal var apiUrl: HttpUrl? = null
@@ -172,6 +178,7 @@ class GlobalConfigModule private constructor(builder: Builder) {
         internal var repositoryManager: IRepositoryManager? = null
         internal var enableHttpLogging: Boolean = false
         internal var jsonConverter: JsonConverter? = null
+        internal var customConfigurationWrap: CustomConfigurationWrap? = null
 
         fun baseUrl(baseUrl: String): Builder {//基础url
             if (TextUtils.isEmpty(baseUrl)) {
@@ -273,6 +280,15 @@ class GlobalConfigModule private constructor(builder: Builder) {
             return this
         }
 
+        fun customConfiguration(customConfiguration: CustomConfiguration): Builder {
+            if (this.customConfigurationWrap == null) {
+                customConfigurationWrap = CustomConfigurationWrapImpl()
+            }
+            (customConfigurationWrap as CustomConfigurationWrapImpl)
+                .addCustomConfiguration(customConfiguration)
+            return this
+        }
+
         fun build(): GlobalConfigModule {
             return GlobalConfigModule(this)
         }
@@ -357,3 +373,23 @@ class GsonConfigurationImpl : GsonConfiguration {
         }
     }
 }
+
+class CustomConfigurationWrapImpl : CustomConfigurationWrap {
+    private var mCustomConfigurations: MutableList<CustomConfiguration>? = null
+
+    fun addCustomConfiguration(customConfiguration: CustomConfiguration) {
+        if (mCustomConfigurations == null) {
+            mCustomConfigurations = mutableListOf()
+        }
+        mCustomConfigurations!!.add(customConfiguration)
+    }
+
+    override val customConfigurations: List<CustomConfiguration>?
+        get() = mCustomConfigurations
+}
+
+interface CustomConfigurationWrap {
+    val customConfigurations: List<CustomConfiguration>?
+}
+
+interface CustomConfiguration
