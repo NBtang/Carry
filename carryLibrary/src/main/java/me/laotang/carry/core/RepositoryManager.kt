@@ -1,6 +1,5 @@
 package me.laotang.carry.core
 
-import com.google.gson.reflect.TypeToken
 import com.laotang.quickdev.rxtray.Preference
 import com.laotang.quickdev.rxtray.RxTray
 import me.laotang.carry.core.cache.Cache
@@ -34,19 +33,26 @@ class RepositoryManager(
         defaultValue: T,
         type: Type
     ): Preference<T> {
-        if (type == TypeToken.get(String::class.java).type) {
-            return rxTray.getString(key, defaultValue as String) as Preference<T>
+        return when (defaultValue) {
+            is String -> {
+                rxTray.getString(key, defaultValue as String) as Preference<T>
+            }
+            is Boolean -> {
+                rxTray.getBoolean(key, defaultValue as Boolean) as Preference<T>
+            }
+            is Int -> {
+                rxTray.getInteger(key, defaultValue as Int) as Preference<T>
+            }
+            is Long -> {
+                rxTray.getLong(key, defaultValue as Long) as Preference<T>
+            }
+            is Float -> {
+                rxTray.getFloat(key, defaultValue as Float) as Preference<T>
+            }
+            else -> {
+                rxTray.getObject(key, defaultValue, type)
+            }
         }
-        if (type == TypeToken.get(Boolean::class.java).type) {
-            return rxTray.getBoolean(key, defaultValue as Boolean) as Preference<T>
-        }
-        if (type == TypeToken.get(Int::class.java).type) {
-            return rxTray.getInteger(key, defaultValue as Int) as Preference<T>
-        }
-        if (type == TypeToken.get(Long::class.java).type) {
-            return rxTray.getLong(key, defaultValue as Long) as Preference<T>
-        }
-        return rxTray.getObject(key, defaultValue, type)
     }
 
     @Synchronized

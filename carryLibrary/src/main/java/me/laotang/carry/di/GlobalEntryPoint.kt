@@ -2,6 +2,7 @@ package me.laotang.carry.di
 
 import android.content.Context
 import com.google.gson.Gson
+import com.laotang.quickdev.rxtray.RxTray
 import me.laotang.carry.ManifestDynamicAdapter
 import me.laotang.carry.core.imageloader.ImageLoader
 import dagger.hilt.EntryPoint
@@ -30,6 +31,8 @@ object GlobalEntryPoint {
         fun cacheFile(): File
 
         fun activityConfigAdapter(): ManifestDynamicAdapter.ActivityConfigAdapter?
+
+        fun rxTray(): RxTray
     }
 
     fun getImageLoader(context: Context): ImageLoader {
@@ -60,6 +63,10 @@ object GlobalEntryPoint {
     fun getJsonConverter(context: Context): JsonConverter {
         return getEntryPoint(context)
             .jsonConverter()
+    }
+
+    fun getTray(context: Context): RxTray {
+        return getEntryPoint(context).rxTray()
     }
 
     internal fun getEntryPoint(context: Context): IGlobalEntryPoint {

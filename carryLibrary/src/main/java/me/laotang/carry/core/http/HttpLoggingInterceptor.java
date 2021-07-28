@@ -218,6 +218,8 @@ public final class HttpLoggingInterceptor implements Interceptor {
                 }
             }
         }
+        logger.log(url, logInfo.toString());
+        logInfo.delete(0,logInfo.length());
 
         long startNs = System.nanoTime();
         Response response;
